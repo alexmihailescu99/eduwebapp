@@ -34,7 +34,7 @@ public class User implements UserDetails {
     @Column(name = "last_name")
     private @Getter @Setter String lastName;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "roles")
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role {
