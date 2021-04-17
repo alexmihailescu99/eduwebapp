@@ -34,6 +34,7 @@ public class User implements UserDetails {
     @Column(name = "last_name")
     private @Getter @Setter String lastName;
 
+    // Eagerly fetching due to an error with lazy fetching
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
