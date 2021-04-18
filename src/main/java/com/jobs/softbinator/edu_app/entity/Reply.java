@@ -30,6 +30,5 @@ public class Reply {
     private @Getter @Setter Post post;
 
     @Column(name = "posted_at")
-    private @Getter @Setter
-    Date postedAt;
+    private @Getter @Setter Date postedAt;
 }

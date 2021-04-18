@@ -8,6 +8,8 @@ import java.util.List;
 public interface PostDAO {
     void add(Post post);
     Post findById(Long id);
+    List<Post> findAll();
+    List<Post> findAllFollowed(User user);
     List<Post> findByTitle(String title);
     List<Post> findByAuthor(User author);
 }

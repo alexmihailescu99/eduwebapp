@@ -2,6 +2,7 @@ package com.jobs.softbinator.edu_app.controller;
 
 import com.jobs.softbinator.edu_app.dao.RoleDAO;
 import com.jobs.softbinator.edu_app.dao.UserDAO;
+import com.jobs.softbinator.edu_app.dto.UserDTO;
 import com.jobs.softbinator.edu_app.dto.UserRegisterDTO;
 import com.jobs.softbinator.edu_app.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -40,10 +44,92 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<String> test() {
-        return new ResponseEntity<>((String) SecurityContextHolder
+    public ResponseEntity<UserDTO> test() {
+        User user = userDAO.findByUsername((String) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getPrincipal(), HttpStatus.OK);
+                .getPrincipal());
+        if (user == null)
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        UserDTO userDTO = UserDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .role(user.getRoles().iterator().next().getName())
+                .build();
+
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/follow/{followedId}")
+    public ResponseEntity<String> addFollower(@PathVariable Long followedId) {
+        User follower = userDAO.findByUsername((String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+        User followed = userDAO.findById(followedId);
+        if (follower == null || followed == null)
+            return new ResponseEntity<>("Could not find user(s)", HttpStatus.NOT_FOUND);
+
+        if (followedId.equals(follower.getId()))
+            return new ResponseEntity<>("You can not follow yourself", HttpStatus.BAD_REQUEST);
+
+        if (followed.getFollowers().contains(follower))
+            return new ResponseEntity<>("User is already followed", HttpStatus.BAD_REQUEST);
+
+        followed.getFollowers().add(follower);
+        follower.getFollowed().add(followed);
+        // Update the followed user in the database
+        userDAO.add(followed);
+        userDAO.add(follower);
+        return new ResponseEntity<>("Follower added successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/follower")
+    public ResponseEntity<List<UserDTO>> getFollowers() {
+        User user = userDAO.findByUsername((String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+
+        List<User> followers = user.getFollowers();
+        List<UserDTO> userDTOs = new ArrayList<>();
+        for (User follower : followers) {
+            UserDTO currUser = UserDTO.builder()
+                    .id(follower.getId())
+                    .firstName(follower.getFirstName())
+                    .lastName(follower.getLastName())
+                    .username(follower.getUsername())
+                    .role(follower.getRoles().iterator().next().getName())
+                    .build();
+            userDTOs.add(currUser);
+        }
+
+        return new ResponseEntity<>(userDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("/followed")
+    public ResponseEntity<List<UserDTO>> getFollowed() {
+        User user = userDAO.findByUsername((String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+
+        List<User> followed = user.getFollowed();
+        List<UserDTO> userDTOs = new ArrayList<>();
+        for (User follower : followed) {
+            UserDTO currUser = UserDTO.builder()
+                    .id(follower.getId())
+                    .firstName(follower.getFirstName())
+                    .lastName(follower.getLastName())
+                    .username(follower.getUsername())
+                    .role(follower.getRoles().iterator().next().getName())
+                    .build();
+            userDTOs.add(currUser);
+        }
+
+        return new ResponseEntity<>(userDTOs, HttpStatus.OK);
     }
 }

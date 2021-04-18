@@ -16,6 +16,7 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/api/message")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MessageController {
     @Autowired
     private MessageDAO messageDAO;
@@ -25,7 +26,11 @@ public class MessageController {
 
     @PostMapping
     public ResponseEntity<String> send(MessageDTO message) {
-        User sender = userDAO.findById(message.getSenderId()), receiver = userDAO.findById(message.getReceiverId());
+        User sender = userDAO.findByUsername((String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+        User receiver = userDAO.findById(message.getReceiverId());
         if (message.getSenderId() <= 0 || sender == null)
             return new ResponseEntity<>("Bad sender id\n", HttpStatus.BAD_REQUEST);
         if (message.getReceiverId() <= 0 || receiver == null)
@@ -35,7 +40,7 @@ public class MessageController {
 
         Message newMessage = Message.builder()
                 .content(message.getContent())
-                .sender(userDAO.findById(message.getSenderId()))
+                .sender(sender)
                 .receiver(userDAO.findById(message.getReceiverId()))
                 .sentAt(new Date(System.currentTimeMillis()))
                 .build();
@@ -45,8 +50,9 @@ public class MessageController {
     }
 
     @GetMapping
-    public ResponseEntity<ArrayList<MessageDTO>> getDiscussion(@RequestParam Long senderId, @RequestParam Long receiverId) {
+    public ResponseEntity<ArrayList<MessageDTO>> getDiscussion(@RequestParam Long receiverId) {
         User currUser = userDAO.findByUsername((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        Long senderId = currUser.getId();
         // Allow only the user to access their own messages
         if (currUser.getId() != senderId && currUser.getId() != receiverId) {
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
