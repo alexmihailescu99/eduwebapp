@@ -37,6 +37,18 @@ public class PostDAOImpl implements PostDAO {
         return result.isEmpty() ? null : result;
     }
 
+
+    @Override
+    @Transactional
+    public List<Post> findAllLike(String like) {
+        Session currSession = entityManager.unwrap(Session.class);
+        Query q = currSession.createQuery("from Post p where upper(p.title) like upper(:like) order by p.postedAt asc");
+        // I don't know if this would be vunerable to SQL injection
+        q.setParameter("like", "%" + like + "%");
+        List<Post> result = q.getResultList();
+        return result.isEmpty() ? null : result;
+    }
+
     @Override
     @Transactional
     public List<Post> findAllFollowed(User user) {

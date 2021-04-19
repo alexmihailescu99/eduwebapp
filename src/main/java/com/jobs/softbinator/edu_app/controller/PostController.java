@@ -52,6 +52,26 @@ public class PostController {
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<PostDTO>> getPostsLike(@RequestParam String title) {
+        List<Post> fullPosts = postDAO.findAllLike(title);
+        if (fullPosts == null)
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+        List<PostDTO> posts = new ArrayList<>();
+        for (Post p : fullPosts) {
+            PostDTO postDTO = PostDTO.builder()
+                    .id(p.getId())
+                    .authorUsername(p.getAuthor().getUsername())
+                    .title(p.getTitle())
+                    .content(p.getContent())
+                    .postedAt(p.getPostedAt())
+                    .build();
+            posts.add(postDTO);
+        }
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
     @GetMapping("/{postId}")
     public ResponseEntity<List<ReplyDTO>> getReplies(@PathVariable Long postId) {
         Post post = postDAO.findById(postId);
