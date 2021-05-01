@@ -25,9 +25,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse res,
                                     FilterChain chain) throws IOException, ServletException {
         String header = req.getHeader(SecurityConstants.HEADER_STRING);
-
         // If the header does not exist or it doesn't start with Bearer
         if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+            System.out.println(header);
             // Move on
             chain.doFilter(req, res);
             return;
@@ -41,13 +41,16 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(SecurityConstants.HEADER_STRING);
         if (token != null) {
+            System.out.println(token);
+            System.out.println("");
             // Parse the token
             String user = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET_KEY.getBytes()))
                     .build()
                     .verify(token.replace(SecurityConstants.TOKEN_PREFIX, ""))
                     .getSubject();
-
+            System.out.println(user);
             if (user != null) {
+                System.out.println("successful!");
                 return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
             }
             return null;

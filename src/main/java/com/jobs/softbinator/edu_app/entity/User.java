@@ -34,6 +34,15 @@ public class User implements UserDetails {
     @Column(name = "last_name")
     private @Getter @Setter String lastName;
 
+    @Column(name = "email")
+    private @Getter @Setter String email;
+
+    @Column(name = "occupation")
+    private @Getter @Setter String occupation;
+
+    @Column(name = "phone_number")
+    private @Getter @Setter String phoneNumber;
+
     // Eagerly fetching due to an error with lazy fetching
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(

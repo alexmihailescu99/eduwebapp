@@ -25,7 +25,7 @@ public class MessageController {
     private UserDAO userDAO;
 
     @PostMapping
-    public ResponseEntity<String> send(MessageDTO message) {
+    public ResponseEntity<String> send(@RequestBody MessageDTO message) {
         User sender = userDAO.findByUsername((String) SecurityContextHolder
                 .getContext()
                 .getAuthentication()

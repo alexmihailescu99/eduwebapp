@@ -10,4 +10,7 @@ public class UserRegisterDTO {
     private @Getter @Setter String password;
     private @Getter @Setter String firstName;
     private @Getter @Setter String lastName;
+    private @Getter @Setter String email;
+    private @Getter @Setter String occupation;
+    private @Getter @Setter String phoneNumber;
 }

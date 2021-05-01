@@ -30,13 +30,17 @@ public class UserController {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @PostMapping
-    public ResponseEntity<String> register(UserRegisterDTO userCredentials) {
+    public ResponseEntity<String> register(@RequestBody UserRegisterDTO userCredentials) {
+        System.out.println(userCredentials.getUsername());
         User newUser = User.builder()
                 .username(userCredentials.getUsername())
                 .password(bCryptPasswordEncoder.encode(userCredentials.getPassword()))
                 .firstName(userCredentials.getFirstName())
                 .lastName(userCredentials.getLastName())
                 .roles(Arrays.asList(roleDAO.findByName("USER")))
+                .email(userCredentials.getEmail())
+                .occupation(userCredentials.getOccupation())
+                .phoneNumber(userCredentials.getPhoneNumber())
                 .build();
         userDAO.add(newUser);
 
@@ -58,6 +62,29 @@ public class UserController {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .role(user.getRoles().iterator().next().getName())
+                .email(user.getEmail())
+                .occupation(user.getOccupation())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
+
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserDTO> getUserDetails(@PathVariable String username) {
+        User user = userDAO.findByUsername(username);
+        if (user == null)
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+        UserDTO userDTO = UserDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .role(user.getRoles().iterator().next().getName())
+                .email(user.getEmail())
+                .occupation(user.getOccupation())
+                .phoneNumber(user.getPhoneNumber())
                 .build();
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);

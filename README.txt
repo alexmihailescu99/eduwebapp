@@ -1,0 +1,1 @@
+In order for the requests to work from the front-end, I had to add @RequestBody to all the functions. In order for Postman to work, we have to remove those annotations.

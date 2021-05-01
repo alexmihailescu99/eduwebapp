@@ -104,7 +104,7 @@ public class PostController {
 
 
     @PostMapping
-    public ResponseEntity<String> addPost(PostDTO post) {
+    public ResponseEntity<String> addPost(@RequestBody PostDTO post) {
         User currUser = userDAO.findByUsername((String) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
