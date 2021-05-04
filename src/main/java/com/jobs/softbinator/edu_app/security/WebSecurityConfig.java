@@ -15,7 +15,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     CorsFilter corsFilter() {
-        return new CorsFilter();
+        CorsFilter filter = new CorsFilter();
+        return filter;
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -25,9 +26,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Allow register
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers(HttpMethod.POST,"/api/user").permitAll()
-                .antMatchers("/api/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/post").permitAll()
-                .antMatchers("/**").authenticated()
+                .antMatchers("/api/**").authenticated()
                 .and()
                 .addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class)
                 // Add our custom authentication & authorization filters

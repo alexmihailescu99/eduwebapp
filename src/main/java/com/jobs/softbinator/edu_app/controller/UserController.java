@@ -47,6 +47,27 @@ public class UserController {
         return new ResponseEntity<>("Successfully added user " + newUser.getUsername(), HttpStatus.OK);
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {
+        User user = userDAO.findByUsername((String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+        System.out.println(user.getUsername() + " is trying to update his profile");
+        // If the user does not exist or someone other than the user wants to modify the profile
+        if (user == null || !userDTO.getUsername().equals(user.getUsername()))
+            return new ResponseEntity<>("You may not modify this profile", HttpStatus.UNAUTHORIZED);
+
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        user.setOccupation(userDTO.getOccupation());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        userDAO.add(user);
+
+        return new ResponseEntity<>("Successfully updated user " + user.getUsername(), HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<UserDTO> test() {
         User user = userDAO.findByUsername((String) SecurityContextHolder
@@ -130,6 +151,9 @@ public class UserController {
                     .lastName(follower.getLastName())
                     .username(follower.getUsername())
                     .role(follower.getRoles().iterator().next().getName())
+                    .email(follower.getEmail())
+                    .occupation(follower.getOccupation())
+                    .phoneNumber(follower.getPhoneNumber())
                     .build();
             userDTOs.add(currUser);
         }
@@ -153,10 +177,30 @@ public class UserController {
                     .lastName(follower.getLastName())
                     .username(follower.getUsername())
                     .role(follower.getRoles().iterator().next().getName())
+                    .email(follower.getEmail())
+                    .occupation(follower.getOccupation())
+                    .phoneNumber(follower.getPhoneNumber())
                     .build();
             userDTOs.add(currUser);
         }
 
         return new ResponseEntity<>(userDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("/followed/{followedId}")
+    public ResponseEntity<String> checkFollowed(@PathVariable Long followedId) {
+        User user = userDAO.findByUsername((String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+        System.out.println(user.getUsername());
+        User followed = userDAO.findById(followedId);
+        if (followed == null)
+            return new ResponseEntity<>("This does not exist", HttpStatus.NOT_FOUND);
+
+        if (user.getFollowed().contains(followed))
+            return new ResponseEntity<>("true", HttpStatus.OK);
+
+        return new ResponseEntity<>("false", HttpStatus.OK);
     }
 }
