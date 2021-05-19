@@ -23,6 +23,9 @@ public class Post {
     @Column(name = "content")
     private @Getter @Setter String content;
 
+    @Column(name = "category")
+    private @Getter @Setter String category;
+
     @ManyToOne
     @JoinColumn(name = "author")
     private @Getter @Setter User author;

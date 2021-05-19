@@ -32,7 +32,7 @@ public class PostDAOImpl implements PostDAO {
     @Transactional
     public List<Post> findAll() {
         Session currSession = entityManager.unwrap(Session.class);
-        Query q = currSession.createQuery("from Post p order by p.postedAt asc");
+        Query q = currSession.createQuery("from Post p order by p.postedAt desc");
         List<Post> result = q.getResultList();
         return result.isEmpty() ? null : result;
     }

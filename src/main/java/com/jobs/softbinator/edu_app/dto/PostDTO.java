@@ -12,5 +12,7 @@ public class PostDTO {
     private @Getter @Setter String authorUsername;
     private @Getter @Setter String title;
     private @Getter @Setter String content;
+    private @Getter @Setter String category;
     private @Getter @Setter Date postedAt;
+    private @Getter @Setter Long noReplies;
 }

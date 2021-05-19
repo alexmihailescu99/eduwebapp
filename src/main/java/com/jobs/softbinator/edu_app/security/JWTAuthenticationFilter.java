@@ -39,7 +39,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             // Create a POJO from the JSON
             UserLoginDTO userCredentials = new ObjectMapper().readValue(req.getInputStream(), UserLoginDTO.class);
-            System.out.println("User auth: " + userCredentials.getUsername());
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             userCredentials.getUsername(),
