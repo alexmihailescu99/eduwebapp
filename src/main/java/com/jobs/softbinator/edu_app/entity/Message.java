@@ -24,8 +24,8 @@ public class Message {
     @JoinColumn(name = "receiver")
     private @Getter @Setter User receiver;
 
-    @Column(name = "content")
-    private @Getter @Setter String content;
+    @Column(name = "body")
+    private @Getter @Setter String body;
 
     @Column(name = "sent_at")
     private @Getter @Setter Date sentAt;

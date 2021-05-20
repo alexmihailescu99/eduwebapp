@@ -25,13 +25,13 @@ public class UserService {
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public void add(UserRegisterDTO userCredentials) {
+    public void add(UserRegisterDTO userCredentials, String role) {
         User user = User.builder()
                 .username(userCredentials.getUsername())
                 .password(bCryptPasswordEncoder.encode(userCredentials.getPassword()))
                 .firstName(userCredentials.getFirstName())
                 .lastName(userCredentials.getLastName())
-                .roles(Arrays.asList(roleDAO.findByName("USER")))
+                .roles(Arrays.asList(roleDAO.findByName(role)))
                 .email(userCredentials.getEmail())
                 .occupation(userCredentials.getOccupation())
                 .phoneNumber(userCredentials.getPhoneNumber())
@@ -45,7 +45,7 @@ public class UserService {
                 .getAuthentication()
                 .getPrincipal());
 
-        // If the user does not exist or someone other than the user wants to modify the profile
+        // If the user does not exist or someone other than the user or admin wants to modify the profile
         if (user == null || !userDTO.getUsername().equals(user.getUsername()))
             return false;
 
@@ -56,6 +56,28 @@ public class UserService {
         user.setPhoneNumber(userDTO.getPhoneNumber());
         userDAO.add(user);
         return true;
+    }
+
+    public List<UserDTO> findAll() {
+        List<User> users = userDAO.findAll();
+        if (users == null || users.isEmpty())
+            return null;
+
+        List<UserDTO> userDTOs = new ArrayList<>();
+        for (User user : users) {
+            UserDTO userDTO = UserDTO.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .role(user.getRoles().iterator().next().getName())
+                    .email(user.getEmail())
+                    .occupation(user.getOccupation())
+                    .phoneNumber(user.getPhoneNumber())
+                    .build();
+            userDTOs.add(userDTO);
+        }
+        return userDTOs;
     }
 
     public UserDTO test() {
@@ -101,18 +123,28 @@ public class UserService {
                 .getAuthentication()
                 .getPrincipal());
         User followed = userDAO.findById(followedId);
+
         if (follower == null || followed == null)
             return false;
 
+        // If the user wants to follow themselves
         if (followedId.equals(follower.getId()))
             return false;
 
-        if (followed.getFollowers().contains(follower))
-            return false;
+        // If the user is already following the person, remove it
+        // Sort of like a trigger
+        if (followed.getFollowers().contains(follower)) {
+            followed.getFollowers().remove(follower);
+            follower.getFollowed().remove(followed);
+            userDAO.add(followed);
+            userDAO.add(follower);
+            return true;
+        }
 
         followed.getFollowers().add(follower);
         follower.getFollowed().add(followed);
-        // Update the followed user in the database
+
+        // Update the users in the database
         userDAO.add(followed);
         userDAO.add(follower);
         return true;

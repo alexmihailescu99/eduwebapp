@@ -9,6 +9,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReplyDTO {
+    private @Getter @Setter Long id;
     private @Getter @Setter String content;
     private @Getter @Setter UserDTO author;
     private @Getter @Setter Date postedAt;

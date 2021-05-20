@@ -29,6 +29,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/post").permitAll()
                 .antMatchers("/api/**").authenticated()
+                .antMatchers("/api/user/admin").hasRole("ADMIN")
+                .antMatchers("/api/user/admin/**").hasRole("ADMIN")
                 .and()
                 .addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class)
                 // Add our custom authentication & authorization filters

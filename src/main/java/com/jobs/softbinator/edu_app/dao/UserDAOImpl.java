@@ -24,6 +24,14 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     @Transactional
+    public List<User> findAll() {
+        Session currSession = entityManager.unwrap(Session.class);
+        Query q = currSession.createQuery("from User u");
+        List<User> result = q.getResultList();
+        return result.isEmpty() ? null : result;
+    }
+    @Override
+    @Transactional
     public List<User> findAllFollowed(User user) {
         Session currSession = entityManager.unwrap(Session.class);
         Query q = currSession.createQuery("select u.followed from User u where u.id = :id");

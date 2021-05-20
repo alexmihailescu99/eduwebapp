@@ -26,6 +26,13 @@ public class ReplyDAOImpl implements ReplyDAO {
 
     @Override
     @Transactional
+    public void delete(Reply reply) {
+        Session currSession = entityManager.unwrap(Session.class);
+        currSession.delete(reply);
+    }
+
+    @Override
+    @Transactional
     public List<Reply> findByPost(Post post) {
         Session currSession = entityManager.unwrap(Session.class);
         Query q = currSession.createQuery("from Reply r where r.post=:post");

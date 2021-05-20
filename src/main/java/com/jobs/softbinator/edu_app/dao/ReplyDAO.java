@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ReplyDAO {
     void add(Reply reply);
+    void delete(Reply reply);
     List<Reply> findByPost(Post post);
     Reply findById(Long id);
     List<Reply> findByAuthor(User author);

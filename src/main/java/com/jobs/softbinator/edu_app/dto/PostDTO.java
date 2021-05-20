@@ -1,5 +1,6 @@
 package com.jobs.softbinator.edu_app.dto;
 
+import com.jobs.softbinator.edu_app.entity.Category;
 import lombok.*;
 
 import java.util.Date;

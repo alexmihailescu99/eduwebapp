@@ -1,8 +1,6 @@
 package com.jobs.softbinator.edu_app.service;
 
-import com.jobs.softbinator.edu_app.dao.PostDAO;
-import com.jobs.softbinator.edu_app.dao.ReplyDAO;
-import com.jobs.softbinator.edu_app.dao.UserDAO;
+import com.jobs.softbinator.edu_app.dao.*;
 import com.jobs.softbinator.edu_app.dto.PostDTO;
 import com.jobs.softbinator.edu_app.dto.ReplyDTO;
 import com.jobs.softbinator.edu_app.dto.UserDTO;
@@ -28,6 +26,12 @@ public class PostService {
     @Autowired
     ReplyDAO replyDAO;
 
+    @Autowired
+    RoleDAO roleDAO;
+
+    @Autowired
+    CategoryDAO categoryDAO;
+
     public void add(PostDTO postDTO) {
         User currUser = userDAO.findByUsername((String) SecurityContextHolder
                 .getContext()
@@ -38,7 +42,7 @@ public class PostService {
                 .title(postDTO.getTitle())
                 .content(postDTO.getContent())
                 .author(currUser)
-                .category(postDTO.getCategory())
+                .category(categoryDAO.findByTitle(postDTO.getCategory()))
                 .postedAt(new Date(System.currentTimeMillis()))
                 .replies(new ArrayList<Reply>())
                 .build();
@@ -55,7 +59,7 @@ public class PostService {
                 .authorUsername(post.getAuthor().getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .category(post.getCategory())
+                .category(post.getCategory().getTitle())
                 .postedAt(post.getPostedAt())
                 .build();
     }
@@ -73,7 +77,7 @@ public class PostService {
                     .authorUsername(p.getAuthor().getUsername())
                     .title(p.getTitle())
                     .content(p.getContent())
-                    .category(p.getCategory())
+                    .category(p.getCategory().getTitle())
                     .postedAt(p.getPostedAt())
                     .noReplies(replies == null ? 0 : (long)replies.size())
                     .build();
@@ -88,6 +92,9 @@ public class PostService {
             return null;
 
         List<Reply> replies = replyDAO.findByPost(post);
+        if (replies == null || replies.isEmpty())
+            return null;
+
         List<ReplyDTO> replyDTOs = new ArrayList<>();
 
         for (Reply reply : replies) {
@@ -97,9 +104,13 @@ public class PostService {
                     .firstName(reply.getAuthor().getFirstName())
                     .lastName(reply.getAuthor().getLastName())
                     .role(reply.getAuthor().getRoles().iterator().next().getName())
+                    .email(reply.getAuthor().getEmail())
+                    .occupation(reply.getAuthor().getOccupation())
+                    .phoneNumber(reply.getAuthor().getPhoneNumber())
                     .build();
 
             ReplyDTO replyDTO = ReplyDTO.builder()
+                    .id(reply.getId())
                     .author(userDTO)
                     .content(reply.getContent())
                     .postedAt(reply.getPostedAt())
@@ -123,5 +134,21 @@ public class PostService {
                 .post(post)
                 .build();
         replyDAO.add(reply);
+    }
+
+    public Boolean deleteReply(Long replyId) {
+        Reply reply = replyDAO.findById(replyId);
+        System.out.println(reply.getContent());
+        User currUser = userDAO.findByUsername((String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+        // Only the author, moderator and admins can delete a reply
+        if (reply.getAuthor().getId() != currUser.getId()
+                && !currUser.getRoles().contains(roleDAO.findByName("ROLE_ADMIN")))
+            return false;
+
+        replyDAO.delete(reply);
+        return true;
     }
 }

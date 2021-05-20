@@ -1,6 +1,7 @@
 package com.jobs.softbinator.edu_app;
 
 import com.jobs.softbinator.edu_app.service.FollowService;
+import com.jobs.softbinator.edu_app.service.MessageService;
 import com.jobs.softbinator.edu_app.service.PostService;
 import com.jobs.softbinator.edu_app.service.UserService;
 import org.springframework.boot.SpringApplication;
@@ -24,6 +25,9 @@ public class EduAppApplication {
 
 	@Bean
 	FollowService followService() { return new FollowService(); }
+
+	@Bean
+	MessageService messageService() { return new MessageService(); }
 
 	public static void main(String[] args) {
 		SpringApplication.run(EduAppApplication.class, args);

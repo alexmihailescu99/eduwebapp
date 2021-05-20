@@ -68,6 +68,14 @@ public class User implements UserDetails {
     )
     private @Getter @Setter List<User> followed = new ArrayList<>();
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_category",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private @Getter @Setter List<Category> followedCategories = new ArrayList<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Probably pretty inefficient to do this every single time

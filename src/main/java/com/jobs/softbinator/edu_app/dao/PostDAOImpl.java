@@ -1,5 +1,6 @@
 package com.jobs.softbinator.edu_app.dao;
 
+import com.jobs.softbinator.edu_app.entity.Category;
 import com.jobs.softbinator.edu_app.entity.Post;
 import com.jobs.softbinator.edu_app.entity.User;
 import org.hibernate.Session;
@@ -37,29 +38,15 @@ public class PostDAOImpl implements PostDAO {
         return result.isEmpty() ? null : result;
     }
 
-
-    @Override
-    @Transactional
-    public List<Post> findAllLike(String like) {
-        Session currSession = entityManager.unwrap(Session.class);
-        Query q = currSession.createQuery("from Post p where upper(p.title) like upper(:like) order by p.postedAt asc");
-        // I don't know if this would be vunerable to SQL injection
-        q.setParameter("like", "%" + like + "%");
-        List<Post> result = q.getResultList();
-        return result.isEmpty() ? null : result;
-    }
-
     @Override
     @Transactional
     public List<Post> findAllFollowed(User user) {
         Session currSession = entityManager.unwrap(Session.class);
         List<User> followed = userDAO.findAllFollowed(user);
-        List<Long> followedId = new ArrayList<>();
-        for (User u : followed) {
-            followedId.add(u.getId());
-        }
-        Query q = currSession.createQuery("from Post p where p.author.id in :followed order by p.postedAt asc");
-        q.setParameter("followed", followedId);
+        List<Category> followedCategories = user.getFollowedCategories();
+        Query q = currSession.createQuery("from Post p where p.author in :followed or p.category in :followedCategories order by p.postedAt desc");
+        q.setParameter("followed", followed);
+        q.setParameter("followedCategories", followedCategories);
         List<Post> result = q.getResultList();
         return result.isEmpty() ? null : result;
     }

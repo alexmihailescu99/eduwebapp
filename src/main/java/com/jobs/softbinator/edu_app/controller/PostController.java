@@ -2,6 +2,8 @@ package com.jobs.softbinator.edu_app.controller;
 
 import com.jobs.softbinator.edu_app.dto.PostDTO;
 import com.jobs.softbinator.edu_app.dto.ReplyDTO;
+import com.jobs.softbinator.edu_app.entity.Category;
+import com.jobs.softbinator.edu_app.service.FollowService;
 import com.jobs.softbinator.edu_app.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,9 @@ import java.util.List;
 public class PostController {
     @Autowired
     PostService postService;
+
+    @Autowired
+    FollowService followService;
 
     @GetMapping
     public ResponseEntity<List<PostDTO>> getFrontPage() {
@@ -56,5 +61,18 @@ public class PostController {
 
         postService.addReply(postId, replyDTO);
         return new ResponseEntity<String>("Reply added successfully", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/replies/{replyId}")
+    public ResponseEntity<String> deleteReply(@PathVariable Long replyId) {
+        return (postService.deleteReply(replyId)) ? new ResponseEntity<String>("Reply deleted successfully", HttpStatus.OK)
+                : new ResponseEntity<>("Could not delete reply", HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<Category>> categories() {
+        List<Category> categories = followService.findAllCategories();
+        return (categories != null) ? new ResponseEntity<>(categories, HttpStatus.OK)
+                : new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 }

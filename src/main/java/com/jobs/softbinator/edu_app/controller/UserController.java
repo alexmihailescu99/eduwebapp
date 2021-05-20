@@ -19,7 +19,13 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<String> register(@RequestBody UserRegisterDTO userCredentials) {
-        userService.add(userCredentials);
+        userService.add(userCredentials, "ROLE_USER");
+        return new ResponseEntity<>("Successfully added user " + userCredentials.getUsername(), HttpStatus.OK);
+    }
+
+    @PostMapping("/admin")
+    public ResponseEntity<String> registerAdmin(@RequestBody UserRegisterDTO userCredentials) {
+        userService.add(userCredentials, "ROLE_ADMIN");
         return new ResponseEntity<>("Successfully added user " + userCredentials.getUsername(), HttpStatus.OK);
     }
 
@@ -35,6 +41,13 @@ public class UserController {
         UserDTO currUser = userService.test();
         return (currUser != null) ? new ResponseEntity<>(currUser, HttpStatus.OK)
                 : new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserDTO>> getAll() {
+        List<UserDTO> userDTOs = userService.findAll();
+        return (userDTOs != null && !(userDTOs.isEmpty())) ? new ResponseEntity<>(userDTOs, HttpStatus.OK)
+                : new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/{username}")

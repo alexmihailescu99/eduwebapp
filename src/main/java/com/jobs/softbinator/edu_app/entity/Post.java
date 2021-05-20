@@ -23,15 +23,16 @@ public class Post {
     @Column(name = "content")
     private @Getter @Setter String content;
 
-    @Column(name = "category")
-    private @Getter @Setter String category;
-
     @ManyToOne
     @JoinColumn(name = "author")
     private @Getter @Setter User author;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private @Getter @Setter List<Reply> replies;
+
+    @OneToOne
+    @JoinColumn(name = "category")
+    private @Getter @Setter Category category;
 
     @Column(name = "posted_at")
     private @Getter @Setter Date postedAt;
