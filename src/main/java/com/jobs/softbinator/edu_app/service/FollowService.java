@@ -65,7 +65,6 @@ public class FollowService {
 
     public Boolean addFollowedCategory(String category) {
         Category cat = categoryDAO.findByTitle(category);
-        System.out.println(cat.getTitle());
         if (cat == null)
             return false;
 

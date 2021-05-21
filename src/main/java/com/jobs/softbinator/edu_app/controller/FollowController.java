@@ -27,7 +27,6 @@ public class FollowController {
 
     @PostMapping("/{category}")
     public ResponseEntity<String> addFollowedCategory(@PathVariable String category) {
-        System.out.println(category);
         return (followService.addFollowedCategory(category)) ? new ResponseEntity<>("OK", HttpStatus.OK)
                 : new ResponseEntity<>("NOT OK", HttpStatus.BAD_REQUEST);
     }
