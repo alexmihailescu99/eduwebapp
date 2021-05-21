@@ -25,26 +25,6 @@ public class MessageDAOImpl implements MessageDAO {
     }
 
     @Override
-    @Transactional
-    public List<Message> findBySender(User sender) {
-        Session currSession = entityManager.unwrap(Session.class);
-        Query q = currSession.createQuery("from Message m where m.sender = :sender");
-        q.setParameter("sender", sender.getId());
-        List<Message> res = q.getResultList();
-        return res.isEmpty() ? null : res;
-    }
-
-    @Override
-    @Transactional
-    public List<Message> findByReceiver(User receiver) {
-        Session currSession = entityManager.unwrap(Session.class);
-        Query q = currSession.createQuery("from Message m where m.receiver = :receiver");
-        q.setParameter("receiver", receiver);
-        List<Message> res = q.getResultList();
-        return res.isEmpty() ? null : res;
-    }
-
-    @Override
     public List<Message> findDiscussion(User sender, User receiver) {
         Session currSession = entityManager.unwrap(Session.class);
         String queryString = "from Message m where (m.sender = :sender and m.receiver = :receiver) or (m.sender = :receiver and m.receiver = :sender) order by sentAt asc ";

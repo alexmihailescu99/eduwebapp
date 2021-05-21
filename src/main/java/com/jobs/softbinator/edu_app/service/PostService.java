@@ -138,7 +138,6 @@ public class PostService {
 
     public Boolean deleteReply(Long replyId) {
         Reply reply = replyDAO.findById(replyId);
-        System.out.println(reply.getContent());
         User currUser = userDAO.findByUsername((String) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
@@ -150,5 +149,30 @@ public class PostService {
 
         replyDAO.delete(reply);
         return true;
+    }
+
+    public List<PostDTO> getOwnPosts() {
+        User currUser = userDAO.findByUsername((String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+
+        List<Post> posts = postDAO.findByAuthor(currUser);
+
+        List<PostDTO> postDTOs = new ArrayList<>();
+        for (Post post : posts) {
+            List<Reply> replies = replyDAO.findByPost(post);
+            PostDTO postDTO = PostDTO.builder()
+                    .id(post.getId())
+                    .authorUsername(post.getAuthor().getUsername())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .category(post.getCategory().getTitle())
+                    .postedAt(post.getPostedAt())
+                    .noReplies(replies == null ? 0 : (long)replies.size())
+                    .build();
+            postDTOs.add(postDTO);
+        }
+        return (posts != null && !posts.isEmpty()) ? postDTOs : null;
     }
 }

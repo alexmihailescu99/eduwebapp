@@ -10,6 +10,5 @@ public interface PostDAO {
     Post findById(Long id);
     List<Post> findAll();
     List<Post> findAllFollowed(User user);
-    List<Post> findByTitle(String title);
     List<Post> findByAuthor(User author);
 }

@@ -75,4 +75,11 @@ public class PostController {
         return (categories != null) ? new ResponseEntity<>(categories, HttpStatus.OK)
                 : new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
+
+    @GetMapping("/own")
+    public ResponseEntity<List<PostDTO>> ownPosts() {
+        List<PostDTO> postDTOs = postService.getOwnPosts();
+        return (postDTOs != null) ? new ResponseEntity<>(postDTOs, HttpStatus.OK)
+                : new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
 }

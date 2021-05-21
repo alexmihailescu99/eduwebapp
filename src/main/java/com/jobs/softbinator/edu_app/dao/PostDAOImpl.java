@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -62,19 +60,9 @@ public class PostDAOImpl implements PostDAO {
     }
 
     @Override
-    @Transactional
-    public List<Post> findByTitle(String title) {
-        Session currSession = entityManager.unwrap(Session.class);
-        Query q = currSession.createQuery("from Post p where p.title=:title order by p.postedAt asc");
-        q.setParameter("title", title);
-        List<Post> result = q.getResultList();
-        return result.isEmpty() ? null : result;
-    }
-
-    @Override
     public List<Post> findByAuthor(User author) {
         Session currSession = entityManager.unwrap(Session.class);
-        Query q = currSession.createQuery("from Post p where p.author=:author order by p.postedAt asc");
+        Query q = currSession.createQuery("from Post p where p.author=:author order by p.postedAt desc");
         q.setParameter("author", author);
         List<Post> result = q.getResultList();
         return result.isEmpty() ? null : result;
